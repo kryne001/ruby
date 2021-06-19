@@ -1,4 +1,5 @@
 Class Shop
 {
+   Number unshelved
    
 }
