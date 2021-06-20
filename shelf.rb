@@ -1,22 +1,36 @@
 require_relative 'candy.rb'
 
 class Shelf
-   attr_accessor :number, :candy_array, :total_candies, :shelf_full, :num_candies,
+   attr_accessor :number, :candy_hash, :total_candies, :shelf_full, :num_candies,
                   :name_array
 
    def initialize(number)
       @number = number
-      @candy_array = [[],[],[]]
+      @candy_hash = Hash.new{ |h, k| h[k] = []}
       @total_candies = 0
       @shelf_full = 0
       @name_array = Array.new
+   end
+
+   def get_index(candy)
+      if @name_array.length == 0
+         return 4
+      end
+      i = 0
+      until candy.name == @name_array[i]
+         i+=1
+      end
+      if candy.name == @name_array[i]
+         return i
+      end
+      return 4
    end
 
    def push_existing_candy(candy)
       i = 0
       until i > @name_array.length
          if candy.name == @name_array[i]
-            @candy_array[i].push(candy)
+            @candy_hash[@name_array[i]].push(candy)
          end
          i += 1
       end
@@ -24,9 +38,9 @@ class Shelf
       @total_candies += 1
    end
 
-   def push_new_candy(candy,index)
-      @candy_array[index].push(candy)
+   def push_new_candy(candy)
       @name_array.push(candy.name)
+      @candy_hash[@name_array.last].push(candy)
       candy.shelve
       @total_candies += 1
    end
@@ -36,7 +50,7 @@ class Shelf
          return 0
       else
          i = 0
-         until i > @name_array.length
+         until i == @name_array.length
             if candy.name == @name_array[i]
                return 1
             end
@@ -53,11 +67,7 @@ class Shelf
    end
 
    def get_candy_type_count(index)
-      i = 0
-      until i > @candy_array[index].length - 1
-         i += 1
-      end
-      return i
+      return @candy_hash[@name_array[index]].size
    end
 
    def add_candy(candy)
@@ -68,23 +78,33 @@ class Shelf
          self.check_full
          if @shelf_full == 1
             puts "shelf full, cannot add candy"
+            return 1
          else
-            self.push_new_candy(candy, @name_array.length)
+            self.push_new_candy(candy)
          end
       end
    end
 
+   # def remove_candy(candy)
+   #    index = get_index(candy)
+   #    if index == 4
+   #       return 1
+   #    else
+   #       @candy_array[index].pop()
+   #    end
+   # end
+
    def print_shelf
+      print "shelf "
+      print @number
+      puts ": "
       i = 0
-      until i > @name_array.length - 1
-         print "Candy: "
-         puts @candy_array[i][0].name
-         print "Amount: "
-         puts get_candy_type_count(i)
+      until i == @name_array.length
+         puts "Candy: " + @name_array[i].to_s
+         puts "Amount: " + get_candy_type_count(i).to_s
          i += 1
       end
-      print "total candies: "
-      puts @total_candies
+      puts "total candies: " + @total_candies.to_s
    end
 
 end
@@ -103,6 +123,9 @@ end
    shelf1.add_candy(Candy.new("mars"))
    shelf1.add_candy(Candy.new("mars"))
 
-
    shelf1.print_shelf
+
+   # puts shelf1.candy_hash
+   # shelf1.remove_candy(Candy.new("mars"))
+
    # shelf1.add_candy(Candy.new("twix"))
