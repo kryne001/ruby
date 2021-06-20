@@ -12,18 +12,19 @@ class Shelf
       @name_array = Array.new
    end
 
-   def get_index(candy)
+   def get_index(candy_name)
       if @name_array.length == 0
          return 4
       end
       i = 0
-      until candy.name == @name_array[i]
+      until candy_name == @name_array[i]
          i+=1
       end
-      if candy.name == @name_array[i]
+      if candy_name == @name_array[i]
          return i
+      else
+         return 4
       end
-      return 4
    end
 
    def push_existing_candy(candy)
@@ -85,14 +86,21 @@ class Shelf
       end
    end
 
-   # def remove_candy(candy)
-   #    index = get_index(candy)
-   #    if index == 4
-   #       return 1
-   #    else
-   #       @candy_array[index].pop()
-   #    end
-   # end
+   def remove_candy(candy_name)
+      index = get_index(candy_name)
+      if index == 4
+         return 1
+      else
+         @candy_hash[@name_array[index]].pop()
+         @total_candies -= 1
+      end
+   end
+
+   def empty_shelf
+      @candy_hash.clear()
+      @name_array.clear()
+      @total_candies = 0
+   end
 
    def print_shelf
       print "shelf "
@@ -108,24 +116,3 @@ class Shelf
    end
 
 end
-
-   shelf1 = Shelf.new(1)
-   shelf1.add_candy(Candy.new("twix"))
-   shelf1.add_candy(Candy.new("twix"))
-   shelf1.add_candy(Candy.new("snickers"))
-   shelf1.add_candy(Candy.new("snickers"))
-   shelf1.add_candy(Candy.new("snickers"))
-   shelf1.add_candy(Candy.new("snickers"))
-   shelf1.add_candy(Candy.new("mars"))
-   shelf1.add_candy(Candy.new("mars"))
-   shelf1.add_candy(Candy.new("mars"))
-   shelf1.add_candy(Candy.new("mars"))
-   shelf1.add_candy(Candy.new("mars"))
-   shelf1.add_candy(Candy.new("mars"))
-
-   shelf1.print_shelf
-
-   # puts shelf1.candy_hash
-   # shelf1.remove_candy(Candy.new("mars"))
-
-   # shelf1.add_candy(Candy.new("twix"))
