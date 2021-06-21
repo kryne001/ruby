@@ -1,45 +1,24 @@
 class Candy
    attr_accessor :name, :shelved
 
-   def initialize(name)
-      @name = name
-      @shelved = 0
+   def initialize(name) # initialize candy as empty
+      @name = name # name of candy
+      @shelved = 0 # shelved status (0 means unshelved, 1 means shelved)
    end
 
-   def self.empty
-      @name = ""
-      @shelved = 0
-   end
-
-   def initialize(name)
-      @candy_name = name
-      @shelved = 0
-   end
-
-   def name
+   def name # returns name
       @candy_name
    end
 
-   def shelved
+   def shelved # return shelved status
       @shelved
    end
 
-   def print_name
-      puts @candy_name
-   end
-
-   def is_shelved
-      if @shelved == 0
-         puts "not shelved"
-      elsif @shelved == 1
-         puts "shelved"
-      end
-   end
-
-   def shelve
+   def shelve # sets to 1 to signify candy is shelved
       @shelved = 1
    end
-   def unshelve
+
+   def unshelve # sets to 0 signify candy is unshelved
       @shelved = 0
    end
 end
