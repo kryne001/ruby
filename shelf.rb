@@ -1,11 +1,10 @@
 require_relative 'candy.rb'
 
 class Shelf
-   attr_accessor :number, :candy_hash, :total_candies, :shelf_full, :num_candies,
+   attr_accessor :candy_hash, :total_candies, :shelf_full, :num_candies,
                   :name_array
 
-   def initialize(number)
-      @number = number
+   def initialize()
       @candy_hash = Hash.new{ |h, k| h[k] = []}
       @total_candies = 0
       @shelf_full = 0
@@ -91,8 +90,8 @@ class Shelf
       if index == 4
          return 1
       else
-         @candy_hash[@name_array[index]].pop()
          @total_candies -= 1
+         return @candy_hash[@name_array[index]].pop()
       end
    end
 
@@ -103,9 +102,6 @@ class Shelf
    end
 
    def print_shelf
-      print "shelf "
-      print @number
-      puts ": "
       i = 0
       until i == @name_array.length
          puts "Candy: " + @name_array[i].to_s

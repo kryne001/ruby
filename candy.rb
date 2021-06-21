@@ -2,6 +2,16 @@ class Candy
    attr_accessor :name, :shelved
 
    def initialize(name)
+      @name = name
+      @shelved = 0
+   end
+
+   def self.empty
+      @name = ""
+      @shelved = 0
+   end
+
+   def initialize(name)
       @candy_name = name
       @shelved = 0
    end

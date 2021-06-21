@@ -1,9 +1,18 @@
 # require '~/Documents/Atom/Ruby/ruby/shelf.rb'
-# require '~/Documents/Atom/Ruby/ruby/candy.rb'
+require_relative 'candy.rb'
 
-array1 = [[]]
-array1.push(0)
-array1.push(1)
-array1[0].push(2)
+list = Hash.new { |h, k| h[k] = [] }
 
-puts array1
+list[:twix].push(Candy.new("twix"))
+list[:twix].push(Candy.new("twix"))
+list[:snickers].push(Candy.new("snickers"))
+
+#=> {:foo=>[123, 456], :bar=>[789]}
+
+puts list[:twix]
+
+
+#=> 456
+
+list
+#=> {:foo=>[123], :bar=>[789]}
