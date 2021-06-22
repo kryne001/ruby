@@ -2,11 +2,12 @@ require_relative 'candy.rb'
 require_relative 'shelf.rb'
 
 class Shop
-   attr_accessor :shelves, :unshelved_hash, :unshelved_names
+   attr_accessor :shelves, :unshelved_hash, :sold_candies_hash
 
    def initialize # initializer
       @shelves = [] # array that holds type Shelf for all shelves in shop
       @unshelved_hash = Hash.new{ |h, k| h[k] = []} # 2D hash array that holds all unshelved candies in shop
+      @sold_candies_hash = Hash.new{ |h, k| h[k] = []}
    end
 
    def receive_candy(candy)
@@ -103,12 +104,29 @@ class Shop
       end
    end
 
+   def sell_candy(candy_name)
+      shelf = self.find_candy_in_shelves(candy_name)
+      @sold_candies_hash[candy_name].push(self.unshelve_candy(candy_name)) if shelf != -1
+   end
+
+   def sell_list(list)
+      # example list [[twix, 2], [snickers, 3], [food,4]]
+      list.each do |x|
+         i = x[1].to_i
+         until i == 0
+            self.sell_candy(x[0])
+            i -= 1
+         end
+      end
+   end
+
    def print_unshelved
       # prints unshelved list
       total = 0
       if @unshelved_hash.keys.length == 0
          puts "-------------------------"
          puts "No unshelved candies"
+         puts "-------------------------"
          return 0
       else
          puts "-------------------------"
@@ -141,8 +159,29 @@ class Shop
       puts total
       puts "-------------------------"
       return total
-
    end
+
+   def print_sold
+      total = 0
+      if @sold_candies_hash.keys.length == 0
+         puts "-------------------------"
+         puts "No sold candies"
+         puts "-------------------------"
+         return 0
+      else
+         puts "-------------------------"
+         puts "Sold candies: "
+         @sold_candies_hash.keys.each do |x|
+            total += @sold_candies_hash[x].length
+            print x
+            print ": "
+            puts @sold_candies_hash[x].length.to_s
+         end
+         print "Total candies sold: "
+         puts total
+         puts "-------------------------"
+         return total
+      end   end
 
    def print_shop
       # prints both unshelved list and all shelves in shop's contents
@@ -151,6 +190,7 @@ class Shop
       print "Total candies in shop (shelved or unshelved): "
       puts total_unshelved + total_shelved
       puts "-------------------------"
+      self.print_sold
    end
 
 end
@@ -160,7 +200,6 @@ shop1.receive_candy(Candy.new("twix"))
 shop1.receive_candy(Candy.new("twix"))
 shop1.receive_candy(Candy.new("snickers"))
 shop1.shelve_single("snickers")
-shop1.shelve_single("twix")
 shop1.shelve_all
 
 
@@ -178,7 +217,9 @@ shop1.shelve_group("mars")
 
 shop1.print_shop
 
-shop1.unshelve_all
 
+sell_list = [["twix", 2], ["snickers", 3], ["food",4]]
+
+shop1.sell_list(sell_list)
 
 shop1.print_shop
