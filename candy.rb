@@ -7,7 +7,7 @@ class Candy
    end
 
    def name # returns name
-      @candy_name
+      @name
    end
 
    def shelved # return shelved status

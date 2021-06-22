@@ -7,40 +7,11 @@ class Shop
    def initialize # initializer
       @shelves = [] # array that holds type Shelf for all shelfs in shop
       @unshelved_hash = Hash.new{ |h, k| h[k] = []} # 2D hash array that holds all unshelved candies in shop
-      @unshelved_names = [] # array of strings that holds name of all unshelved candies in shop
-   end
-
-   def check_if_exists_unshelved(candy)
-      # boolean
-      # checks if candy is in unshelved list
-      # returns 1 if found, 0 if not
-      @unshelved_names.each {|str| return 1 if str == candy.name}
-      return 0
-   end
-
-   def push_new_unshelved(candy)
-      # adds new candy type into unshelved list
-      @unshelved_names << candy.name
-      @unshelved_hash[@unshelved_names.last].push(candy)
-   end
-
-   def push_existing_unshelved(candy)
-      # adds existing candy type to unshelved list
-      @unshelved_names.each{|x| @unshelved_hash[x].push(candy) && break if x == candy.name}
    end
 
    def receive_candy(candy)
-      # receives new single candy to shop and adds to unshelved list
-      # all new candy into shop is added to unshelved list first before being shelved
-      # first, checks if new candy type is already in unshelved list
-      # if no, push new candy type into unshelved list
-      # if yes, push existing candy type into unshelved list
-      check = self.check_if_exists_unshelved(candy)
-      if check == 0
-         self.push_new_unshelved(candy)
-      else
-         self.push_existing_unshelved(candy)
-      end
+      # adds new candy type into unshelved list
+      @unshelved_hash[candy.name].push(candy)
    end
 
    def receive_group(list)
@@ -50,13 +21,13 @@ class Shop
 
    def get_hash_key(candy_name)
       # returns name of candy if it exists in unshelved list
-      @unshelved_names.each{|x| return x if candy_name == x}
+      @unshelved_hash.keys.each{|x| return x if candy_name == x}
    end
 
    def find_candy_in_shelves(candy_name)
       # booleans
       # returns true if candy type has been placed on a shelf
-      @shelves.each {|x| return @shelves.index(x) if x.check_if_exists(candy_name) == 1}
+      @shelves.each {|x| return @shelves.index(x) if x.find_candy(candy_name) == 1}
       return -1
    end
 
@@ -66,17 +37,13 @@ class Shop
       # first, parses through existing shelves in shop to find an empty shelf
       # returns index of shelf in @shelves array if shelf contains candy type
       # if not found, creates new shelf, pushes onto @shelves array, and returns index of new shelf in @shelves array
-      @shelves.each {|str| return @shelves.index(str) if str.shelf_full == 0}
+      @shelves.each {|str| return @shelves.index(str) if str.check_full == 0}
       @shelves << Shelf.new
       return @shelves.index(@shelves.last)
    end
 
    def get_unshelved_candy(candy_name)
-      # returns desired candy from unshelved list
-      # pops candy from unshelved list
-      # return -1 if candy type passed in does not exist to signify fail
-      @unshelved_names.each {|x| return @unshelved_hash[self.get_hash_key(candy_name)].pop() if candy_name == x}
-      return -1
+      return @unshelved_hash[candy_name].pop()
    end
 
    def shelve_single(candy_name)
@@ -86,16 +53,10 @@ class Shop
       # next, check if desired candy type has already been placed on a shelf
       # if yes, adds candy to shelf
       # if no, finds a shelf thats open (or create new shelf) and adds candy there
-      candy = self.get_unshelved_candy(candy_name)
-      if candy == -1
-         puts "candy doesn't exist"
-      else
-         shelf = self.find_candy_in_shelves(candy_name)
-         if shelf == -1
-            @shelves[self.find_open_shelf].add_candy(candy)
-         else
-            @shelves[shelf].add_candy(candy)
-         end
+      shelf = self.find_open_shelf
+      @shelves[shelf].add_candy(self.get_unshelved_candy(candy_name))
+      if @unshelved_hash[candy_name].length == 0
+         @unshelved_hash.delete(candy_name)
       end
    end
 
@@ -110,16 +71,29 @@ class Shop
 
    def shelve_all
       # shelves all candies in unshelved list
-      @unshelved_names.each {|x| self.shelve_group(x)}
+      @unshelved_hash.keys.each {|x| self.shelve_group(x)}
    end
+
+   def remove_candy(candy_name)
+      shelf = self.find_candy_in_shelves(candy_name)
+      self.receive_candy(@shelves[shelf].remove_candy(candy_name))
+   end
+
+   # def remove_group(candy_name)
+   #    shelf = self.find_candy_in_shelves(candy_name)
+   # end
 
    def print_unshelved
       # prints unshelved list
-      puts "Unshelved candies: "
-      @unshelved_names.each do |x|
-            print x
-            print ": "
-            puts @unshelved_hash[x].length.to_s
+      if @unshelved_hash.keys.length == 0
+         puts "No unshelved candies"
+      else
+         puts "Unshelved candies: "
+         @unshelved_hash.keys.each do |x|
+               print x
+               print ": "
+               puts @unshelved_hash[x].length.to_s
+         end
       end
    end
 
@@ -143,22 +117,31 @@ end
 
 shop1 = Shop.new
 shop1.receive_candy(Candy.new("twix"))
-shop1.receive_candy(Candy.new("twix"))
-shop1.receive_candy(Candy.new("snickers"))
-shop1.shelve_single("snickers")
-shop1.shelve_single("twix")
-shop1.shelve_all
-
-list = [Candy.new("mars"),Candy.new("mars"),Candy.new("mars")]
-shop1.receive_group(list)
-shop1.shelve_group("mars")
-
-list = [Candy.new("food"),Candy.new("food"),Candy.new("food")]
-shop1.receive_group(list)
-shop1.shelve_group("food")
-
-list = [Candy.new("mars"),Candy.new("mars"),Candy.new("mars")]
-shop1.receive_group(list)
-shop1.shelve_group("mars")
-
 shop1.print_shop
+shop1.receive_candy(Candy.new("twix"))
+shop1.print_shop
+shop1.receive_candy(Candy.new("snickers"))
+shop1.print_shop
+shop1.shelve_single("snickers")
+shop1.print_shop
+shop1.shelve_single("twix")
+shop1.print_shop
+shop1.shelve_all
+shop1.print_shop
+
+#
+# list = [Candy.new("mars"),Candy.new("mars"),Candy.new("mars")]
+# shop1.receive_group(list)
+# shop1.shelve_group("mars")
+#
+# list = [Candy.new("food"),Candy.new("food"),Candy.new("food")]
+# shop1.receive_group(list)
+# shop1.shelve_group("food")
+#
+# list = [Candy.new("mars"),Candy.new("mars"),Candy.new("mars")]
+# shop1.receive_group(list)
+# shop1.shelve_group("mars")
+
+# shop1.remove_candy("food")
+
+# shop1.print_shop
