@@ -1,13 +1,18 @@
 class Candy
-   attr_accessor :name, :shelved
+   attr_accessor :name, :shelved, :price
 
-   def initialize(name) # initialize candy as empty
+   def initialize(name, price) # initialize candy as empty
       @name = name # name of candy
       @shelved = 0 # shelved status (0 means unshelved, 1 means shelved)
+      @price = price
    end
 
    def name # returns name
       @name
+   end
+
+   def price
+      @price
    end
 
    def shelved # return shelved status
