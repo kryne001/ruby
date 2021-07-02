@@ -5,22 +5,26 @@ require 'io/console'
 $SHELF_CAP
 
 def invalid_entry
+   # general error message
    print "ERROR: Invalid Entry. Please try again."
    sleep(1)
 end
 
 def invalid_retry_int
+   # error message for integer amounts. used for repeating input
    print "Invalid entry. Please enter an amount as an integer: "
 end
 
 
 def opening_prompt
+   # this prompt only runs at open to give instructions and set shelf capacity
    puts "WELCOME TO THE CANDY SHOP"
    sleep(1)
    puts " "
    puts "The candy shop works by first taking in candy as inventory."
    puts "The inventory candy can then be moved from inventory onto display shelves"
-   puts "and off of display shelves back into inventory."
+   puts "and off of display shelves back into inventory. Candy can only be "
+   puts "deleted after being placed onto a shelf."
    sleep(3)
    puts " "
    puts "Lets start by saying how many different candies each shelf can have."
@@ -60,9 +64,10 @@ def repeat_prompt(shop1)
    puts "Press 1 to add more candy to inventory"
    puts "Press 2 to move candy from inventory to shelves"
    if(shop1.no_shelves == $FAIL)
-      puts "Press 3 to remove candy from shelves to inventory"
+      puts "Press 3 to unshelve candy from shelves and move to inventory"
       puts "Press 4 to remove shelf"
-      puts "Press 5 to exit"
+      puts "Press 5 to delete candy"
+      puts "Press 6 to exit"
       print "Enter: "
       begin
          check = Integer(STDIN.gets)
@@ -70,12 +75,12 @@ def repeat_prompt(shop1)
          invalid_entry
          return check
       end
-      if !check.between?(1,5)
+      if !check.between?(1,6)
          invalid_entry
          return check
       end
    else
-      puts "Press 5 to exit"
+      puts "Press 6 to exit"
       print "Enter: "
       begin
          check = Integer(STDIN.gets)
@@ -83,7 +88,7 @@ def repeat_prompt(shop1)
          invalid_entry
          return check
       end
-      if !check.between?(1,2) && check != 5
+      if !check.between?(1,2) && check != 6
          invalid_entry
          return check
       end
@@ -155,9 +160,9 @@ end
 def remove_candy_prompt(shop1)
    puts " "
    puts "----------------"
-   puts "REMOVING CANDY"
+   puts "UNSHELVING CANDY"
    puts "----------------"
-   puts "Which candy would you like to move to inventory?"
+   puts "Which candy would you like to unshelve and move to inventory?"
    name = gets.chomp
    amount = shop1.return_candy_amount(name)
    if amount == $FAIL
@@ -167,7 +172,7 @@ def remove_candy_prompt(shop1)
    end
    printf("There are %d of this type of candy on the shelves", amount)
    puts " "
-   puts "How many would you like to remove?"
+   puts "How many would you like to move?"
    begin
       amount_to_r = Integer(STDIN.gets)
    rescue ArgumentError
@@ -175,7 +180,7 @@ def remove_candy_prompt(shop1)
       retry
    end
    until amount_to_r <= amount
-      print "Amount exceeds total candies available to remove. Please retry: "
+      print "Amount exceeds total candies available to move. Please retry: "
       begin
          amount_to_r = Integer(STDIN.gets)
       rescue ArgumentError
@@ -183,7 +188,7 @@ def remove_candy_prompt(shop1)
          retry
       end
    end
-   puts "Removing #{amount_to_r} #{name}..."
+   puts "Unshelving #{amount_to_r} #{name}..."
    sleep(1)
    remove_candy(shop1, name, amount_to_r)
 end
@@ -193,6 +198,7 @@ def remove_shelf_prompt(shop1)
    puts "----------------"
    puts "REMOVING SHELF"
    puts "----------------"
+   puts "Which candy would you like to unshelve and move to inventory?"
    if shop1.no_shelves == $SUCCEED
       puts "No shelves"
       sleep(1)
@@ -218,6 +224,43 @@ def remove_shelf_prompt(shop1)
    shop1.remove_shelf(shelf_num)
 end
 
+def delete_candy_prompt(shop1)
+   puts " "
+   puts "----------------"
+   puts "DELETING CANDY"
+   puts "----------------"
+   puts "Which candy would you like to delete?"
+   name = gets.chomp
+   amount = shop1.return_candy_amount(name)
+   if amount == $FAIL
+      print "Candy not found in shelves. Please try again"
+      sleep(1)
+      return $FAIL
+   end
+   printf("There are %d of this type of candy on the shelves", amount)
+   puts " "
+   puts "How many would you like to delete?"
+   begin
+      amount_to_d = Integer(STDIN.gets)
+   rescue ArgumentError
+      invalid_retry_int
+      retry
+   end
+   until amount_to_d <= amount
+      print "Amount exceeds total candies available to delete. Please retry: "
+      begin
+         amount_to_r = Integer(STDIN.gets)
+      rescue ArgumentError
+         invalid_retry_int
+         retry
+      end
+   end
+   puts "Deleting #{amount_to_d} #{name}..."
+   sleep(1)
+   delete_candy(shop1, name, amount_to_d)
+end
+
+
 def add_candy(shop1, candy_name, amount)
    candy = Candy.new(candy_name)
    return $FAIL if shop1.receive_candy(candy, amount) == $FAIL
@@ -238,12 +281,19 @@ def remove_candy(shop1, candy_name, amount)
    end
 end
 
+def delete_candy(shop1, candy_name, amount)
+   until amount == 0
+      shop1.delete_candy(candy_name)
+      amount -= 1
+   end
+end
+
 check = 0
 shop1 = Shop.new
 system("clear")
 opening_prompt
 add_candy_prompt(shop1)
-until check == 5
+until check == 6
    system("clear")
    instructions
    shop1.print_shop
@@ -259,6 +309,8 @@ until check == 5
       when 4
          remove_shelf_prompt(shop1)
       when 5
+         delete_candy_prompt(shop1)
+      when 6
          break
       else
          next

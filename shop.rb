@@ -159,6 +159,13 @@ class Shop
       return @shelves.index(@shelves.last)
    end
 
+   def delete_candy(candy_name)
+      shelf = self.find_candy_in_shelves(candy_name)
+      return $FAIL if shelf == $FAIL
+      @shelves[shelf].remove_candy(candy_name)
+      @shelves.delete_at(shelf) if @shelves[shelf].candy_hash.keys.length == 0
+   end
+
    def print_unshelved
       # prints unshelved list
       total = 0
