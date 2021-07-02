@@ -8,10 +8,10 @@ class Shop
    def initialize # initializer
       @shelves = [] # array that holds type Shelf for all shelves in shop
       @unshelved_hash = Hash.new{ |h, k| h[k] = []} # 2D hash array that holds all unshelved candies in shop
-      @sold_candies_hash = Hash.new{ |h, k| h[k] = []}
    end
 
    def invalid_entry
+      # general fail message
       puts "ERROR: Invalid Entry"
       sleep(1)
    end
@@ -32,6 +32,7 @@ class Shop
    end
 
    def create_new_shelf
+      # creates new shelf by adding onto @shelves array
       @shelves << Shelf.new($SHELF_CAP)
       shelf_number = @shelves.index(@shelves.last)
       shelf_print = shelf_number.to_i
@@ -56,43 +57,52 @@ class Shop
    end
 
    def find_unshelved_candy(candy_name)
+      # returns true if candy is found in unshelved inventory
       @unshelved_hash.keys.each {|x| return $SUCCEED if x == candy_name}
       return $FAIL
    end
 
    def unshelved_candy_type_count(candy_name)
+      # returns amount of candy type in unshelved inventory
       return @unshelved_hash[candy_name].length
    end
 
    def no_shelves
+      # returns true is there are no shelves
       return $SUCCEED if @shelves.length == 0
       return $FAIL
    end
 
    def return_shelf(index)
+      # returns true if shelf is found in @shelves array
       @shelves.each {|x| return $SUCCEED if @shelves.index(x) == index}
       return $FAIL
    end
 
    def get_unshelved_candy(candy_name)
+      # pops candy from unshelved list and returns the candy
+      # returns fail is candy doesn't exist
       return $FAIL if @unshelved_hash[candy_name] == nil
       return @unshelved_hash[candy_name].pop()
    end
 
    def check_if_unshelved_empty
+      # returns SUCCEED if there are no candies in inventory
       return $SUCCEED if @unshelved_hash.length == 0
       return $FAIL
    end
 
-   def get_shelf
-      return @shelves.index(@shelves.last)
-   end
-
    def delete_candy_unshelved(candy_name)
+      # removes candy from list of unshelved if no more of type exists
       @unshelved_hash.delete(candy_name) if @unshelved_hash[candy_name].length == 0
    end
 
    def shelve_single(candy_name)
+      # will take candy name in
+      # first, finds candy in unshelved, returns fail if doesnt exist
+      # second, will find if candy type is already on a shelf, will add candy to that shelf
+      # if candy type isn't on a shelf, it'll find an empty shelf to start placing
+      # and if no shelf has space, it will create a new shelf
       unshelved_candy = self.get_unshelved_candy(candy_name)
       return $FAIL if unshelved_candy == $FAIL
       current_index = self.find_candy_in_shelves(candy_name)
@@ -105,34 +115,13 @@ class Shop
       return $SUCCESS
    end
 
-   def shelve_group(candy_name)
-      i = @unshelved_hash[candy_name].length
-      until i == 0
-         return $FAIL if self.shelve_single(candy_name) == $FAIL
-         i -= 1
-      end
-   end
-
-   def remove_shelf(index)
-      return $FAIL if @shelves[index] == nil
-      @shelves.delete_at(index)
-   end
-
    def unshelve_candy(candy_name)
+      # will first find if candy is in shelf, and return shelf location if true
+      # will then pop candy from shelf and place in unshelved list
       shelf = self.find_candy_in_shelves(candy_name)
       return $FAIL if shelf == $FAIL
       self.receive_candy(@shelves[shelf].remove_candy(candy_name),1)
       @shelves.delete_at(shelf) if @shelves[shelf].candy_hash.keys.length == 0
-   end
-
-   def unshelve_group(candy_name)
-      shelf = self.find_candy_in_shelves(candy_name)
-      return $FAIL if shelf == $FAIL
-      count = @shelves[shelf].get_candy_type_count(candy_name)
-      until count == 0
-         self.unshelve_candy(candy_name)
-         count -= 1
-      end
    end
 
    def remove_shelf(index)

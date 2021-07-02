@@ -7,16 +7,17 @@ class Shelf
    def initialize(cap) # initializer
       @candy_hash = Hash.new{ |h, k| h[k] = []} # intializes empty 2D hash table that holds all candy objects on shelf
       @total_candies = 0 # counter for total candies on shelf
-      @capacity = cap
+      @capacity = cap # capacity of shelf
    end
 
    def check_full
-      # sets shelf_full boolean flag to 1 if we have reached terminal candy type size
+      # sets shelf_full boolean flag to SUCCEED if we have reached terminal candy type size
       return $SUCCEED if @candy_hash.keys.length == @capacity
       return $FAIL
    end
 
    def find_candy(candy_name)
+      # returns SUCCEED if candy is on shelf
       @candy_hash.keys.each {|x| return $SUCCEED if x == candy_name}
       return $FAIL
    end
@@ -27,11 +28,14 @@ class Shelf
    end
 
    def add_candy(candy)
+      # adds candy to hash table of candies in shelf
       @candy_hash[candy.name].push(candy)
       @total_candies += 1
    end
 
    def remove_candy(candy_name)
+      # pops candy from list and returns the popped candy
+      # will delete candy type from shelf if there are no more of type 
       @total_candies -= 1
       candy = @candy_hash[candy_name].pop()
       @candy_hash.delete(candy_name) if @candy_hash[candy_name].length == 0

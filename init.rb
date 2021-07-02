@@ -46,6 +46,7 @@ def opening_prompt
 end
 
 def instructions
+   # this will hold the instructions through every iteration as a reminder
    puts " "
    puts "WELCOME TO THE CANDY SHOP"
    puts "The candy shop works by first taking in candy as inventory."
@@ -60,6 +61,7 @@ def instructions
 end
 
 def repeat_prompt(shop1)
+   # this will prompt user for input on next action
    puts "ACTIONS:"
    puts " "
    puts "Press 1 to add more candy to inventory"
@@ -98,6 +100,7 @@ def repeat_prompt(shop1)
 end
 
 def add_candy_prompt(shop1)
+   # get user input for adding candy to inventory
    puts " "
    puts "----------------"
    puts "ADDING CANDY TO INVENTORY"
@@ -126,6 +129,7 @@ def add_candy_prompt(shop1)
 end
 
 def shelve_candy_prompt(shop1)
+   # get user input for shelving candy
    puts " "
    puts "----------------"
    puts "SHELVING CANDY"
@@ -159,6 +163,7 @@ def shelve_candy_prompt(shop1)
 end
 
 def remove_candy_prompt(shop1)
+   # get user input for unshelving candy
    puts " "
    puts "----------------"
    puts "UNSHELVING CANDY"
@@ -195,6 +200,7 @@ def remove_candy_prompt(shop1)
 end
 
 def remove_shelf_prompt(shop1)
+   # get user input for removing a shelf
    puts " "
    puts "----------------"
    puts "REMOVING SHELF"
@@ -227,6 +233,7 @@ def remove_shelf_prompt(shop1)
 end
 
 def delete_candy_prompt(shop1)
+   # get user input for deleting candy
    puts " "
    puts "----------------"
    puts "DELETING CANDY"
@@ -264,12 +271,14 @@ end
 
 
 def add_candy(shop1, candy_name, amount)
+   # takes user input from add_candy_prompt to perform adding candy to inventory
    candy = Candy.new(candy_name)
    return $FAIL if shop1.receive_candy(candy, amount) == $FAIL
    return $SUCCESS
 end
 
 def shelve(shop1, candy_name, amount)
+   # takes user input from shelve_candy_prompt to perform shelving candy function
    until amount == 0
       shop1.shelve_single(candy_name)
       amount -=1
@@ -277,6 +286,7 @@ def shelve(shop1, candy_name, amount)
 end
 
 def remove_candy(shop1, candy_name, amount)
+   # takes user input from remove_candy_prompt to perform unshelving function
    until amount == 0
       shop1.unshelve_candy(candy_name)
       amount -= 1
@@ -284,6 +294,7 @@ def remove_candy(shop1, candy_name, amount)
 end
 
 def delete_candy(shop1, candy_name, amount)
+   # takes user input from delete_candy_prompt to perform deletion function
    until amount == 0
       shop1.delete_candy(candy_name)
       amount -= 1
