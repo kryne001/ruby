@@ -2,163 +2,265 @@ require_relative 'shelf.rb'
 require_relative 'shop.rb'
 require_relative 'candy.rb'
 require 'io/console'
+$SHELF_CAP
 
-$SUCCEED = 1
-$FAIL = -1
+def invalid_entry
+   print "ERROR: Invalid Entry. Please try again."
+   sleep(1)
+end
+
+def invalid_retry_int
+   print "Invalid entry. Please enter an amount as an integer: "
+end
+
 
 def opening_prompt
-   puts "******************"
-   puts "1 to add candy"
-   puts "2 to shelve candy"
-   puts "3 to unshelve candy"
-   puts "4 sell candy"
-   puts "x to end: "
-   check = STDIN.getch
-   puts "******************"
+   puts "WELCOME TO THE CANDY SHOP"
+   sleep(1)
+   puts " "
+   puts "The candy shop works by first taking in candy as inventory."
+   puts "The inventory candy can then be moved from inventory onto display shelves"
+   puts "and off of display shelves back into inventory."
+   sleep(3)
+   puts " "
+   puts "Lets start by saying how many different candies each shelf can have."
+   puts " "
+   print "INPUT SHELF CAPACITY: "
+   begin
+      $SHELF_CAP = Integer(gets.chomp)
+   rescue ArgumentError
+      invalid_retry_int
+      retry
+   end
+   puts " "
+   puts "Once the capacity of a shelf has been reached, a new shelf will be "
+   puts "created. A shelf will hold all candies of a single candy type on the "
+   puts "same shelf in the same position."
+   sleep(3)
+   puts ' '
+   puts "Lets start by adding some candy to our inventory."
+end
+
+def instructions
+   puts " "
+   puts "WELCOME TO THE CANDY SHOP"
+   puts "The candy shop works by first taking in candy as inventory."
+   puts "The inventory candy can then be moved from inventory onto display shelves"
+   puts "and off of display shelves back into inventory."
+   puts "Once the capacity of a shelf has been reached, a new shelf will be "
+   puts "created. A shelf will hold all candies of a single candy type on the "
+   puts "same shelf in the same position."
+   puts "SHELF CAPACITY: #{$SHELF_CAP.to_s}"
+   puts " "
+end
+
+def repeat_prompt(shop1)
+   puts "ACTIONS:"
+   puts " "
+   puts "Press 1 to add more candy to inventory"
+   puts "Press 2 to move candy from inventory to shelves"
+   if(shop1.no_shelves == $FAIL)
+      puts "Press 3 to remove candy from shelves to inventory"
+      puts "Press 4 to remove shelf"
+      puts "Press 5 to exit"
+      print "Enter: "
+      begin
+         check = Integer(STDIN.gets)
+      rescue ArgumentError
+         invalid_entry
+         return check
+      end
+      if !check.between?(1,5)
+         invalid_entry
+         return check
+      end
+   else
+      puts "Press 5 to exit"
+      print "Enter: "
+      begin
+         check = Integer(STDIN.gets)
+      rescue ArgumentError
+         invalid_entry
+         return check
+      end
+      if !check.between?(1,2) && check != 5
+         invalid_entry
+         return check
+      end
+   end
    return check
 end
 
-def add_candy_choice_prompt(shop1)
-   puts "1 to add single candy"
-   puts "2 to add multiple candies"
-   puts "b to return back"
-   check = STDIN.getch
-   case check
-      when '1'
-         receive_single_candy(shop1)
-      when '2'
-         receive_multiple_candies(shop1)
-      when 'b'
-         return
+def add_candy_prompt(shop1)
+   puts " "
+   puts "----------------"
+   puts "ADDING CANDY TO INVENTORY"
+   puts "----------------"
+   print "Input name of candy to add: "
+   name = gets.chomp
+   if !name.match? /\A[a-zA-Z0-9]*\z/
+      invalid_entry
+      return $FAIL
    end
-end
-
-def shelve_choice_prompt(shop1)
-   if shop1.check_if_unshelved_empty == 0
-      puts "ERROR: No candies to shelve"
-      sleep(1)
-   else
-      puts "1 to shelve a single candy"
-      puts "2 to shelve multiple candies of a single type"
-      puts "3 to shelve all unshelved candies"
-      puts "b to go back"
-      input = STDIN.getch
-      case input
-         when '1'
-            shelve_single_candy(shop1)
-         when '2'
-            shelve_all_candy_type(shop1)
-         when '3'
-            shelve_all_candies(shop1)
-         when 'b'
-            return
-      end
+   puts " "
+   print "Amount: "
+   begin
+      amount = Integer(gets.chomp)
+   rescue
+      invalid_retry_int
+      retry
    end
-end
-
-def unshelve_choice_prompt(shop1)
-   puts "1 to unshelve single candy"
-   puts "2 to unshelve all of a type of candy"
-   check = STDIN.getch
-   case check
-      when '1'
-         unshelve_single(shop1)
-      when '2'
-         unshelve_group(shop1)
+   puts " "
+   if add_candy(shop1, name, amount) == $FAIL
+      invalid_entry
+      return $FAIL
    end
+   puts "Adding #{amount} #{name}..."
+   sleep(1)
 end
 
-def receive_single_candy(shop)
-   print "Enter type of candy (input b to go back): "
-   candy = gets.chomp
-   return if candy == "b"
-   price = shop.get_candy_price(candy)
-   if shop.get_candy_price(candy) == $FAIL
-      print "Enter price of candy: "
-      price = gets.chomp
-   end
-   newCandy = Candy.new(candy, price.to_f)
-   shop.receive_candy(newCandy)
-end
-
-def receive_multiple_candies(shop1)
-   candy_name = ""
-   until candy_name == "stop"
-      print "Candy type (input stop to end): "
-      candy_name = gets.chomp
-      return if candy_name == "stop"
-      print "Amount: "
-      candy_amount = gets.chomp
-      candy_price = shop1.get_candy_price(candy_name)
-      if  candy_price == $FAIL
-         print "Price of candy: "
-         candy_price = gets.chomp
-      end
-      shop1.receive_group(candy_name, candy_price.to_f, candy_amount.to_i)
-      puts " "
-   end
-end
-
-def shelve_single_candy(shop1)
-   print "Candy: "
-   candy = gets.chomp
-   if shop1.shelve_single(candy) == $FAIL
-      puts "Invalid entry"
-      sleep(1)
-   end
-end
-
-def shelve_all_candy_type(shop1)
-   print "Candy: "
-   candy = gets.chomp
-   if shop1.shelve_group(candy) == $FAIL
-      puts "ERROR: Invalid entry"
-      sleep(1)
-   end
-end
-
-def shelve_all_candies(shop1)
-   shop1.shelve_all
-end
-
-def unshelve_single(shop1)
-   print "Candy: "
-   candy = gets.chomp
-   if shop1.find_candy_in_shelves(candy) == $FAIL
-      puts "ERROR: Invalid Entry"
+def shelve_candy_prompt(shop1)
+   puts " "
+   puts "----------------"
+   puts "SHELVING CANDY"
+   puts "----------------"
+   print "Enter the name of the candy you wish to shelve: "
+   name = gets.chomp
+   if shop1.find_unshelved_candy(name) == $FAIL
+      puts "Candy not found in inventory. Please try again"
       sleep(1)
       return $FAIL
    end
-   shop1.unshelve_candy(candy)
+   print "Enter the amount of candies you wish to shelve: "
+   begin
+      amount = Integer(gets.chomp)
+   rescue ArgumentError
+      invalid_retry_int
+      retry
+   end
+   until amount <= shop1.unshelved_candy_type_count(name)
+      puts "Amount exceeds total candies in inventory. Please retry: "
+      begin
+         amount = Integer(gets.chomp)
+      rescue ArgumentError
+         invalid_entry
+         retry
+      end
+   end
+   puts "Shelving #{amount} #{name}..."
+   sleep(1)
+   shelve(shop1, name, amount)
 end
 
-def unshelve_group(shop1)
-   print "Candy: "
-   candy = gets.chomp
-   if shop1.find_candy_in_shelves(candy) == $FAIL
-      puts "ERROR: Invalid Entry"
+def remove_candy_prompt(shop1)
+   puts " "
+   puts "----------------"
+   puts "REMOVING CANDY"
+   puts "----------------"
+   puts "Which candy would you like to move to inventory?"
+   name = gets.chomp
+   amount = shop1.return_candy_amount(name)
+   if amount == $FAIL
+      print "Candy not found in shelves. Please try again"
+      return $FAIL
+   end
+   printf("There are %d of this type of candy on the shelves", amount)
+   puts " "
+   puts "How many would you like to remove?"
+   begin
+      amount_to_r = Integer(STDIN.gets)
+   rescue ArgumentError
+      invalid_retry_int
+      retry
+   end
+   until amount_to_r <= amount
+      print "Amount exceeds total candies available to remove. Please retry: "
+      begin
+         amount_to_r = Integer(STDIN.gets)
+      rescue ArgumentError
+         invalid_retry_int
+         retry
+      end
+   end
+   puts "Removing #{amount} #{name}..."
+   sleep(1)
+   remove_candy(shop1, name, amount)
+end
+
+def remove_shelf_prompt(shop1)
+   puts " "
+   puts "----------------"
+   puts "REMOVING SHELF"
+   puts "----------------"
+   if shop1.no_shelves == $SUCCEED
+      puts "No shelves"
       sleep(1)
       return $FAIL
    end
-   shop1.unshelve_group(candy)
+   shop1.print_current_shelves
+   print "Input the number of the shelf you'd like to remove: "
+   begin
+      shelf_num = Integer(gets.chomp)
+   rescue
+      invalid_entry
+      return $FAIL
+   end
+   puts " "
+   last_shelf = shop1.last_shelf+1
+   if shelf_num.between?(1,last_shelf)
+      puts "Shelf does not exist. Please try again"
+      sleep(1)
+      return $FAIL
+   end
+   puts "Removing shelf #{shelf_num}..."
+   shop1.remove_shelf(shelf_num)
 end
 
-check = ''
+def add_candy(shop1, candy_name, amount)
+   candy = Candy.new(candy_name)
+   return $FAIL if shop1.receive_candy(candy, amount) == $FAIL
+   return $SUCCESS
+end
+
+def shelve(shop1, candy_name, amount)
+   until amount == 0
+      shop1.shelve_single(candy_name)
+      amount -=1
+   end
+end
+
+def remove_candy(shop1, candy_name, amount)
+   until amount == 0
+      shop1.unshelve_candy(candy_name)
+      amount -= 1
+   end
+end
+
+check = 0
 shop1 = Shop.new
 system("clear")
-shop1.print_shop
-until check == 'x'
-   check = opening_prompt
-   case check
-      when '1'
-         add_candy_choice_prompt(shop1)
-      when '2'
-         shelve_choice_prompt(shop1)
-      when '3'
-         unshelve_choice_prompt(shop1)
-   end
+opening_prompt
+add_candy_prompt(shop1)
+until check == 5
    system("clear")
+   instructions
    shop1.print_shop
-
-
+   puts ""
+   check = repeat_prompt(shop1)
+   case check
+      when 1
+         add_candy_prompt(shop1)
+      when 2
+         shelve_candy_prompt(shop1)
+      when 3
+         remove_candy_prompt(shop1)
+      when 4
+         remove_shelf_prompt(shop1)
+      when 5
+         break
+      else
+         next
+   end
 end
+system("clear")
+shop1.print_shop

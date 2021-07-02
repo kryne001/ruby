@@ -1,7 +1,5 @@
 require_relative 'candy.rb'
-
-$SUCCEED = 1
-$FAIL = -1
+$SHELF_CAP
 
 class Shelf
    attr_accessor :candy_hash, :total_candies, :capacity
@@ -14,9 +12,7 @@ class Shelf
 
    def check_full
       # sets shelf_full boolean flag to 1 if we have reached terminal candy type size
-      if @candy_hash.keys.length == @capacity
-         return $SUCCEED
-      end
+      return $SUCCEED if @candy_hash.keys.length == @capacity
       return $FAIL
    end
 
@@ -42,25 +38,19 @@ class Shelf
       return candy
    end
 
-   def get_candy_price(candy_name)
-      return $FAIL if self.find_candy(candy_name) == $FAIL
-      return @candy_hash[candy_name][0].price
-   end
-
    def print_shelf
       # prints all candy names and amount held in shelf
       # print total candies held on shelf
+      longest = @candy_hash.keys.flatten.map do |x|
+         x.size
+      end.max
       @candy_hash.keys.each do |x|
-         printf("%10s", "Candy: ")
-         puts x.rjust(15)
-         # print "Candy: ".rjust(5)
-         # printf("Candy: ", "%20d", x)
-         printf("%10s", "Amount: ")
-         puts get_candy_type_count(x).to_s.rjust(15)
+         puts "   Candy:           #{x.rjust(longest)}"
+         puts "   Amount:          #{get_candy_type_count(x).to_s.rjust(longest)}"
          puts " "
       end
-      printf("%10s", "Total: ")
-      puts @total_candies.to_s.rjust(15)
+      puts "   Total:           #{@total_candies.to_s.rjust(longest)}"
+      puts
    end
 
 end
