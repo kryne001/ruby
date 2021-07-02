@@ -27,7 +27,7 @@ def opening_prompt
    puts "deleted after being placed onto a shelf."
    sleep(3)
    puts " "
-   puts "Lets start by saying how many different candies each shelf can have."
+   puts "Lets start by saying how many different types of candies each shelf can have."
    puts " "
    print "INPUT SHELF CAPACITY: "
    begin
@@ -37,9 +37,9 @@ def opening_prompt
       retry
    end
    puts " "
-   puts "Once the capacity of a shelf has been reached, a new shelf will be "
-   puts "created. A shelf will hold all candies of a single candy type on the "
-   puts "same shelf in the same position."
+   puts "Once the max amount of types of candy that can be on a shelf has been"
+   puts "reached, a new shelf will be created. A shelf will hold all candies "
+   puts "of a single candy name together on a shelf."
    sleep(3)
    puts ' '
    puts "Lets start by adding some candy to our inventory."
@@ -50,10 +50,11 @@ def instructions
    puts "WELCOME TO THE CANDY SHOP"
    puts "The candy shop works by first taking in candy as inventory."
    puts "The inventory candy can then be moved from inventory onto display shelves"
-   puts "and off of display shelves back into inventory."
-   puts "Once the capacity of a shelf has been reached, a new shelf will be "
-   puts "created. A shelf will hold all candies of a single candy type on the "
-   puts "same shelf in the same position."
+   puts "and off of display shelves back into inventory. Candy can only be "
+   puts "deleted after being placed onto a shelf."
+   puts "Once the max amount of types of candy that can be on a shelf has been"
+   puts "reached, a new shelf will be created. A shelf will hold all candies "
+   puts "of a single candy name together on a shelf."
    puts "SHELF CAPACITY: #{$SHELF_CAP.to_s}"
    puts " "
 end
@@ -215,12 +216,13 @@ def remove_shelf_prompt(shop1)
    end
    puts " "
    last_shelf = shop1.last_shelf+1
-   if shelf_num.between?(1,last_shelf)
+   if !shelf_num.between?(1,last_shelf)
       puts "Shelf does not exist. Please try again"
       sleep(1)
       return $FAIL
    end
    puts "Removing shelf #{shelf_num}..."
+   sleep(1)
    shop1.remove_shelf(shelf_num)
 end
 
