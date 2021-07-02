@@ -98,7 +98,7 @@ def add_candy_prompt(shop1)
    puts "----------------"
    print "Input name of candy to add: "
    name = gets.chomp
-   if !name.match? /\A[a-zA-Z0-9]*\z/
+   if !name.match? /\A[a-zA-Z0-9 ]*\z/
       invalid_entry
       return $FAIL
    end
@@ -162,6 +162,7 @@ def remove_candy_prompt(shop1)
    amount = shop1.return_candy_amount(name)
    if amount == $FAIL
       print "Candy not found in shelves. Please try again"
+      sleep(1)
       return $FAIL
    end
    printf("There are %d of this type of candy on the shelves", amount)
@@ -182,9 +183,9 @@ def remove_candy_prompt(shop1)
          retry
       end
    end
-   puts "Removing #{amount} #{name}..."
+   puts "Removing #{amount_to_r} #{name}..."
    sleep(1)
-   remove_candy(shop1, name, amount)
+   remove_candy(shop1, name, amount_to_r)
 end
 
 def remove_shelf_prompt(shop1)
@@ -203,6 +204,7 @@ def remove_shelf_prompt(shop1)
       shelf_num = Integer(gets.chomp)
    rescue
       invalid_entry
+      sleep(1)
       return $FAIL
    end
    puts " "
