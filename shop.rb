@@ -124,6 +124,16 @@ class Shop
       @shelves.delete_at(shelf) if @shelves[shelf].candy_hash.keys.length == 0
    end
 
+   def unshelve_group(candy_name)
+      shelf = self.find_candy_in_shelves(candy_name)
+      return $FAIL if shelf == $FAIL
+      count = @shelves[shelf].get_candy_type_count(candy_name)
+      until count == 0
+         self.unshelve_candy(candy_name)
+         count -= 1
+      end
+   end
+
    def remove_shelf(index)
       return $FAIL if @shelves[index-1] == nil
       @shelves[index-1].candy_hash.keys.each {|x| self.unshelve_group(x)}

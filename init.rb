@@ -39,7 +39,7 @@ def opening_prompt
    puts " "
    puts "Once the max amount of types of candy that can be on a shelf has been"
    puts "reached, a new shelf will be created. A shelf will hold all candies "
-   puts "of a single candy name together on a shelf."
+   puts "of a single candy name together."
    sleep(3)
    puts ' '
    puts "Lets start by adding some candy to our inventory."
@@ -55,7 +55,7 @@ def instructions
    puts "deleted after being placed onto a shelf."
    puts "Once the max amount of types of candy that can be on a shelf has been"
    puts "reached, a new shelf will be created. A shelf will hold all candies "
-   puts "of a single candy name together on a shelf."
+   puts "of a single candy name together."
    puts "SHELF CAPACITY: #{$SHELF_CAP.to_s}"
    puts " "
 end
