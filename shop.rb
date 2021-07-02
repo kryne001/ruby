@@ -183,7 +183,6 @@ class Shop
             puts x.ljust(15) +  @unshelved_hash[x].length.to_s
          end
          puts " "
-         puts "Total:".ljust(15) + total.to_s
          puts "-------------------------"
          return total
       end
@@ -194,7 +193,7 @@ class Shop
       # prints all shelves in shop's contents
       total = 0
       if @shelves.length == 0
-         puts "There are currently no candies on any shelf"
+         puts "There are currently no shelves"
          puts "-------------------------"
          return 0
       else
@@ -220,8 +219,8 @@ class Shop
       # prints both unshelved list and all shelves in shop's contents
       total_unshelved = self.print_unshelved
       total_shelved = self.print_shelved
-      print "Total candies in shop (shelved or unshelved): "
-      puts total_unshelved + total_shelved
+      puts "Total candies unshelved:     #{total_unshelved}"
+      puts "Total candies shelved:       #{total_shelved}"
       puts "-------------------------"
       puts ""
    end
