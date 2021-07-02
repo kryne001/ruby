@@ -125,6 +125,7 @@ class Shop
    end
 
    def unshelve_group(candy_name)
+      # runs unshelve candy on entire list of key in hash
       shelf = self.find_candy_in_shelves(candy_name)
       return $FAIL if shelf == $FAIL
       count = @shelves[shelf].get_candy_type_count(candy_name)
@@ -135,11 +136,15 @@ class Shop
    end
 
    def remove_shelf(index)
+      # removes shelf by unshelving every candy in specified shelf then
+      # removing shelf from @shelves array
       return $FAIL if @shelves[index-1] == nil
       @shelves[index-1].candy_hash.keys.each {|x| self.unshelve_group(x)}
    end
 
    def return_candy_amount(candy_name)
+      # returns amount of specific candy type on shelves
+      # returns FAIL if candy isnt found in shelf
       shelf_num = self.find_candy_in_shelves(candy_name)
       return $FAIL if shelf_num == $FAIL
       return @shelves[shelf_num].get_candy_type_count(candy_name)
@@ -155,10 +160,14 @@ class Shop
    end
 
    def last_shelf
+      #returns index of last shelf in @shelves array
       return @shelves.index(@shelves.last)
    end
 
    def delete_candy(candy_name)
+      # first will check if candy is on shelves, returns FAIL if it doesnt exist
+      # then will call remove_candy method from shelf.rb to remove candy from shelf
+      # will delete shelf from @shelves array if shelf no longer has contents
       shelf = self.find_candy_in_shelves(candy_name)
       return $FAIL if shelf == $FAIL
       @shelves[shelf].remove_candy(candy_name)
